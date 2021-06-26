@@ -42,6 +42,9 @@ downloadFile "https://www.openssl.org/source/$LIBSSL_TAR" "$LIBSSLDIR/$LIBSSL_TA
 LIBSSLSRC="$LIBSSLDIR/src/"
 mkdir -p "$LIBSSLSRC"
 
+declare -a PKG_CONFIG_LIBSSL
+declare -a PKG_CONFIG_CRYPTO
+
 set +e
 echo "Extracting $LIBSSL_TAR"
 tar -zxkf "$LIBSSLDIR/$LIBSSL_TAR" -C "$LIBSSLSRC" --strip-components 1 2>&-
@@ -61,6 +64,8 @@ do
   OPENSSLDIR="$LIBSSLDIR/${PLATFORM}_$SDK_VERSION-$ARCH"
   LIPO_LIBSSL="$LIPO_LIBSSL $OPENSSLDIR/libssl.a"
   LIPO_LIBCRYPTO="$LIPO_LIBCRYPTO $OPENSSLDIR/libcrypto.a"
+  PKG_CONFIG_LIBSSL+=("$OPENSSLDIR/libssl.pc")
+  PKG_CONFIG_CRYPTO+=("$OPENSSLDIR/libcrypto.pc")
 
   if [[ -f "$OPENSSLDIR/libssl.a" ]] && [[ -f "$OPENSSLDIR/libcrypto.a" ]]; then
     echo "libssl.a and libcrypto.a for $ARCH already exist."
@@ -111,5 +116,8 @@ lipoFatLibrary "$LIPO_LIBSSL" "$BASEPATH/openssl_$SDK_PLATFORM/lib/libssl.a"
 lipoFatLibrary "$LIPO_LIBCRYPTO" "$BASEPATH/openssl_$SDK_PLATFORM/lib/libcrypto.a"
 
 importHeaders "$OPENSSLDIR/include/" "$BASEPATH/openssl_$SDK_PLATFORM/include"
+
+importPkgConfig "$BASEPATH/openssl_$SDK_PLATFORM" "${PKG_CONFIG_LIBSSL[@]}"
+importPkgConfig "$BASEPATH/openssl_$SDK_PLATFORM" "${PKG_CONFIG_CRYPTO[@]}"
 
 echo "Building done."

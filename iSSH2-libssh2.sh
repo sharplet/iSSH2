@@ -36,6 +36,8 @@ downloadFile "http://www.libssh2.org/download/$LIBSSH_TAR" "$LIBSSHDIR/$LIBSSH_T
 LIBSSHSRC="$LIBSSHDIR/src/"
 mkdir -p "$LIBSSHSRC"
 
+declare -a PKG_CONFIG
+
 set +e
 echo "Extracting $LIBSSH_TAR"
 tar -zxkf "$LIBSSHDIR/$LIBSSH_TAR" -C "$LIBSSHDIR/src" --strip-components 1 2>&-
@@ -50,6 +52,7 @@ do
   PLATFORM_SRC="$LIBSSHDIR/${PLATFORM}_$SDK_VERSION-$ARCH/src"
   PLATFORM_OUT="$LIBSSHDIR/${PLATFORM}_$SDK_VERSION-$ARCH/install"
   LIPO_SSH2="$LIPO_SSH2 $PLATFORM_OUT/lib/libssh2.a"
+  PKG_CONFIG+=("$PLATFORM_OUT/lib/pkgconfig/libssh2.pc")
 
   if [[ -f "$PLATFORM_OUT/lib/libssh2.a" ]]; then
     echo "libssh2.a for $ARCH already exists."
@@ -94,5 +97,7 @@ done
 lipoFatLibrary "$LIPO_SSH2" "$BASEPATH/libssh2_$SDK_PLATFORM/lib/libssh2.a"
 
 importHeaders "$LIBSSHSRC/include/" "$BASEPATH/libssh2_$SDK_PLATFORM/include"
+
+importPkgConfig "$BASEPATH/libssh2_$SDK_PLATFORM" "${PKG_CONFIG[@]}"
 
 echo "Building done."

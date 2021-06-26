@@ -71,6 +71,19 @@ importHeaders () {
   cp -RL "$input" "$output"
 }
 
+importPkgConfig () {
+  local prefix=$1
+  local src_pc=$2
+  local dest_pc
+
+  dest_pc="$prefix/lib/pkgconfig/$(basename "$src_pc")"
+
+  mkdir -p "$(dirname "$dest_pc")"
+  sed <"$src_pc" >"$dest_pc" "/^prefix=/c\\
+prefix=$prefix
+"
+}
+
 platformName () {
   case "$1" in
     macosx) echo "MacOSX" ;;
