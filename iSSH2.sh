@@ -193,7 +193,7 @@ if [[ -z "$MIN_VERSION" ]]; then
   exit 1
 fi
 
-if [[  "$SDK_PLATFORM" == "macosx" ]] || [[ "$SDK_PLATFORM" == "iphoneos" ]] || [[ "$SDK_PLATFORM" == "appletvos" ]] || [[ "$SDK_PLATFORM" == "watchos" ]]; then
+if [[  "$SDK_PLATFORM" == "macosx" ]] || [[ "$SDK_PLATFORM" == "iphoneos" ]] || [[ "$SDK_PLATFORM" == "iphonesimulator" ]] || [[ "$SDK_PLATFORM" == "appletvos" ]] || [[ "$SDK_PLATFORM" == "watchos" ]]; then
   if [[ -z "$ARCHS" ]]; then
     ARCHS="$TARGET_ARCHS"
 
@@ -225,6 +225,10 @@ if [[  "$SDK_PLATFORM" == "macosx" ]] || [[ "$SDK_PLATFORM" == "iphoneos" ]] || 
 
       if [[ $(version "$MIN_VERSION") < $(version "10.0") ]]; then
         ARCHS="$ARCHS i386"
+      fi
+    elif [[ "$SDK_PLATFORM" == "iphonesimulator" ]]; then
+      if [[ -z "$ARCHS" ]]; then
+        ARCHS="arm64 x86_64"
       fi
     elif [[ "$SDK_PLATFORM" == "appletvos" ]]; then
       ARCHS="$ARCHS arm64 x86_64"
